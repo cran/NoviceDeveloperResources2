@@ -1,0 +1,174 @@
+---
+title: "NoviceDeveloperResources2"
+author: Barry Zeeberg [aut, cre]
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{NoviceDeveloperResources2}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<style>
+body {
+text-align: justify}
+</style>
+
+<p class=MsoNormal align=center style='text-align:center'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;font-family:"Times New Roman",serif'><o:p>&nbsp;</o:p></span></b></p>
+
+<p class=MsoNormal align=center style='text-align:center'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;font-family:"Times New Roman",serif'><o:p>&nbsp;</o:p></span></b></p>
+
+<p class=MsoNormal align=center style='text-align:center'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;font-family:"Times New Roman",serif'>Barry
+Zeeberg<o:p></o:p></span></b></p>
+
+<p class=MsoNormal align=center style='text-align:center'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;font-family:"Times New Roman",serif'>barryz2013@gmail.com<o:p></o:p></span></b></p><br>
+
+<p class=MsoNormal style='text-align:justify'><span style='font-size:16.0pt;
+font-family:"Times New Roman",serif'><o:p>&nbsp;</o:p></span></p>
+
+<center>
+**MOTIVATION**
+</center>
+
+I recently submitted a package *NoviceDeveloperResources*. As described there, the several commands in the sequence to take package folders containing your raw R program file to a functional package attached to your search path are not too tedious to execute once or twice. But if you are developing a set of inter-related packages, and you need to fine tune them, the process can become quite repetitive, confusing, and tedious. To facilitate this, within the *NoviceDeveloperResources* package I have provided the function
+
+**x<-checkBuildInstallSourcePackage(dir,packs,packCheck,autoLibrary)**
+
+The parameter *packs* is a list of the names of packages to be processed.
+
+If you are running *checkBuildInstallSourcePackage()* because you modified a certain package, then packs should include the name of that package as well as any other packages which *import()* that package. Otherwise those other packages may remain linked to the obsoleted version of that package. Furthermore, the names of these packages in the input list packs must be in the correct order so that the upper level packages *import()* the new version of the leaf node packages, rather than simply once again *import()* the obsolete version. This could be figured out manually, but the process is tedious and error-prone.
+
+<center>
+**ADDITIONAL INTEGRATED FUNCTIONS**
+</center>
+
+The current CRAN package *NoviceDeveloperResources2* contains an integrated program <span style="color:red;">**sortedInputForCheckBuildInstallSourcePackageDriver()**</span> to invoke *checkBuildInstallSourcePackage()* with the package names in the correct order within *packs*. This driver is the single master function to run in order to invoke all of the other functions in the packages *NoviceDeveloperResources* and *NoviceDeveloperResources2*.
+
+I will use a rather complicated set of recently-posted packages to illustrate the examples.
+
+The hierarchy of imported packages is shown in Figure 1.
+
+![](Figure1.jpg)
+
+Figure 1. The hierarchy of imported packages.
+
+There are 2 main functions in this package:
+
+**sortedInputForCheckBuildInstallSourcePackage()** computes a list of packages in the correct order (Figure 2) to input to *checkBuildInstallSourcePackage()*. Note that in the input to *bottomUpRecursiveDriver()*, *iterationDriver* was designated as the only package that contained a modification. As shown in Figure 1, this package is imported by packages *playOneTrick* and *playWholeHandDriverPassParams*, so the order of the 3 packages to *checkBuildInstallSourcePackage()* must be in the order given in the bottom line in Figure 2.
+
+![](Figure2.jpg)
+
+Figure 2. Snippet of the output while running the example for **sortedInputForCheckBuildInstallSourcePackage()**. *packs* had been set to c("playOneTrick","iterationDriver","playWholeHandDriverPassParams").
+
+**sortedInputForCheckBuildInstallSourcePackageDriver()** is a driver to invoke the sequence of functions to retrieve the correctly ordered list of packages (as sketched in Figure 2) and to submit this list (contained in the parameter *s*) to *checkBuildInstallSourcePackage()*.
+
+<center>
+**HOW TO IMPLEMENT GLOBAL VARIABLES ACROSS MULTIPLE PACKAGES**
+</center>
+
+I include this section because I experienced a great deal of unnecessary difficulty figuring out how to implement global variables across multiple files. It was next to impossible for me to find a statement that I could understand, and equally impossible to find snippets of a specific working example. To make life easier for the novice developer, I will now provide both of these.
+
+There are three considerations:
+
+<span style="color:red;">**1. How to include a global variable in a function within packages (P2, P3, . . .), if that variable is defined or assigned a value in a different package P1**</span>
+
+Assume that P1 is imported by P2, P3, . . . . Then the first line (outside of any function definitions) in all packages will be
+
+**globalVariables(c("global1","global2", . . .))**
+
+where global1 *etc.* are the names of the global variables, and each such name is enclosed in quotation marks. The global variables can be simple scalars, or vectors, matrices, *etc.*. This is explained in language for the more advanced user in [https://rdrr.io/r/utils/globalVariables.html.](https://rdrr.io/r/utils/globalVariables.html)
+
+Here is a real-world example:
+The package *cardUtils* plays the role of P1
+
+![](Figure3.jpg){width=100%}
+Figure 3. The *globalVariables()* line as the first line in cardUtils.R, outside of any function definitions.
+
+The package *editDriver* plays the role of P2. Notice that the list of variables is a subset of that for *cardUtils*, including only those that are actually used in *editDriver*.
+
+![](Figure4.jpg){width=100%}
+Figure 4. The *globalVariables()* line as the first line in editDriver.R, outside of any function definitions.
+
+<span style="color:red;">**2. How to assign/change the value of a global variable**</span>
+
+There appear to be 2 ways to assign/change the value of a global variable. One way is to use the symbol *<<-*, and the other way is to use the *assign()* function. After much research, I have found that you should **NEVER** use *<<-*, especially in a package that you intend to submit to CRAN. The documentation for *assign()* can be found by typing *help(assign)* in the R Console. 
+
+Here is a real-world example:
+
+![](Figure5.jpg){width=100%}
+
+Figure 5. Example of *assign()* within a function call in the cardUtils package.
+
+Executing *globalDefs()* will result in *e.g.* epsilon.fp showing up as a global variable in the output of the *ls()* command in the R Console.
+
+![](Figure6.jpg){width=100%}
+
+Figure 6. Global variables in the output of the *ls()* command in the R Console.
+
+<span style="color:red;">**3. If you have a global variable that is *e.g.* a vector, how to assign/change the value of a component of that vector**</span>
+
+Say that you have a global variable g that is a vector like g[1:5]. Through trial and error, I have found that the way to change the value of *e.g.* g[3] is to copy the entire vector to a local vector l, then change the value within the local vector l, and *assign()* the local vector l to the global vector g.
+
+Here is a real-world example:
+
+![](Figure7.jpg){width=80%}
+
+Figure 7. Example of using a local copy of a global matrix to change a single value within the global matrix (see lines 987 through 989).
+
+<span style="color:red;">**4. How to access data in a subdirectory of another package**</span>
+
+Say you are writing an example for a function in package A, and the example needs to use data that is in a subdirectory of package B. You can use the *system.file()* command.
+
+Here is a real-life scenario in which I am preparing an example for a function in package A and package B is *cardUtils*
+
+**actualFile<-system.file("extdata/tcpflow.dir/tcpflow.subd/processed.subdir/Actual/Hand7.txt",package="cardUtils")<br>
+actual<-as.matrix(read.table(actualFile))[1:52,1:4]<br>
+lead(actual=actual,leader=2)**<br><br>
+
+<span style="color:red;">**5. How to run a non-R program script from R code in a package**</span>
+
+Say you have an *awk* script in a .awk file that is invoked by an R function in a package. You will need to specify the absolute path name for the .awk file. Fortunately this can be done dynamically using the *.libPaths()* function.
+
+Here is a real-world example. In this case, the .awk file is located in the *inst* subdirectory of the *retrieve* package. But in the specification within the library directory the *inst* is not included in the path name.
+
+Note also that the *awk* script is invoked by the *system()* command
+
+**syst=sprintf("gawk -f %s/retrieve/handsWithoutBots.awk %s",.libPaths(),f)<br>
+good<-system(syst,intern=TRUE)**
+
+<br>
+
+<span style="color:red;">**6. How to invoke *library()* from R code in a package**</span>
+
+You are not allowed to issue a *library()* command from within a function in a CRAN package. The purpose of this restriction is to avoid inadvertently changing the search path without the user's knowledge.
+
+There are 2 options for working around this restriction:
+
+Less convenient option is to generate a character string as the return value of the function, that can be printed using "echo" and then the user explicitly copy and paste to load or update the packages. This can be preceded by a detach() command to make sure that the library() command results in the search path containing the latest version of the package.
+
+**returnStr<-sprintf("%s\\ndetach(\\"package:%s\\")",returnStr,pack)<br>
+returnStr<-sprintf("%s\\nlibrary(%s)",returnStr,pack)<br>
+return(returnStr)**
+
+More convenient option is to pass a Boolean parameter *autoLibrary* (whose default value is FALSE) to the function, so that the user must explicitly set it to TRUE and thus knowingly implement the library() command using the *eval(parse())* mechanism. This can be preceded by a detach() command to make sure that the library() command results in the search path containing the latest version of the package. This automates the process, and the user no longer needs to copy and paste.
+
+**if(autoLibrary) {<br>
+eval(parse(text = sprintf("detach(\\"package:%s\\")",pack)))<br>
+eval(parse(text = sprintf("library(%s)",pack)))<br>
+}**
+
+<center>
+**GRAPHICAL DISPLAY OF INTER-RELATIONSHIP OF PACKAGES AND PROGRAMS **
+</center>
+
+My package *foodwebWrapper* (available in CRAN) provides a graphical representation that might help to keep track of the complex relationships that occur in a project that is split across multiple packages. Please see the *foodwebWrapper* package documentation and vignettes for full details.
+
+Figure 8 shows the depiction of the callers and callees for a complex project that includes 10 inter-related packages. Each **row** represents a caller, and each **column** represents a callee. The names of the callers are given along the left side of the figure, and the names of the callees are given along the top of the figure.
+
+![](Figure8.jpg){width=300%}
+
+Figure 8. Depiction of foodwebWrapper analysis for the set of 10 CRAN packages that comprise my hearts card game project.
