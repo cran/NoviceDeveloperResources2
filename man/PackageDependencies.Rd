@@ -4,14 +4,16 @@
 \alias{PackageDependencies}
 \title{PackageDependencies}
 \usage{
-PackageDependencies(packs, master, n, verbose)
+PackageDependencies(dir, packs, master, n, verbose)
 }
 \arguments{
+\item{dir}{character string containing the name of the directory holding packs}
+
 \item{packs}{list of package names}
 
 \item{master}{list whose componenets are lists indexed by integer recursion level
 the components of each recursion level are the return values of
-recursivePackageDependenciesWrapper() and reversePackageDependencies()}
+retrieveNamespace() and reversePackageDependencies()}
 
 \item{n}{integer recursion level}
 
@@ -20,7 +22,7 @@ recursivePackageDependenciesWrapper() and reversePackageDependencies()}
 \value{
 returns a list whose components are lists indexed by the integer recursion level:
 \item{l}{
-return value of recursivePackageDependenciesWrapper()
+return value of retrieveNamespace()
 }
 \item{ll}{
 return value of reversePackageDependencies()
@@ -35,10 +37,13 @@ NOTE that the packages in packs do not need to be loaded or attached to the sear
 }
 \examples{
 \dontrun{
+# you need to specify dir, packs that are on your own computer !!
+dir1<-"~/personal/hearts/hearts_card_game_bayesian_inference"
+dir2<-"packages/inference_packages/inference_packages/"
 packs<-c("cardUtils","clickableImageMap","editDriver",
 "heartsCIM","iterationDriver","logos","playOneTrick",
 "playWholeHandDriverPassParams","probTab","relaxDriver")
-master<-PackageDependencies(packs, vector("list",length(packs)),1,TRUE)
+master<-PackageDependencies(sprintf("\%s/\%s",dir1,dir2),packs, vector("list",length(packs)),1,TRUE)
 }
 
 }

@@ -7,7 +7,7 @@
 reversePackageDependencies(l)
 }
 \arguments{
-\item{l}{return value of recursivePackageDependenciesWrapper()}
+\item{l}{return value of retrieveNamespace()}
 }
 \value{
 returns a list whose components are 2 lists:
@@ -40,10 +40,13 @@ $zeros$cardUtils cardUtils is an element of ll$zeros since l[["cardUtils"]] has 
 }
 \examples{
 \dontrun{
+# you need to specify dir, packs that are on your own computer !!
+dir1<-"~/personal/hearts/hearts_card_game_bayesian_inference"
+dir2<-"packages/inference_packages/inference_packages/"
 packs<-c("cardUtils","clickableImageMap","editDriver",
 "heartsCIM","iterationDriver","logos","playOneTrick",
 "playWholeHandDriverPassParams","probTab","relaxDriver")
-l<-recursivePackageDependenciesWrapper(packs)
+l<-retrieveNamespace(sprintf("\%s/\%s",dir1,dir2),packs)
 ll<-reversePackageDependencies(l)
 }
 

@@ -34,11 +34,19 @@ packages that are currently under development, so they are not yet available
 }
 \examples{
 \dontrun{
-dir<-"~/inference_packages/"
+# you need to specify dir, packs that are on your own computer !!
+dir1<-"~/personal/hearts/hearts_card_game_bayesian_inference"
+dir2<-"packages/inference_packages/inference_packages/"
+dir<-sprintf("\%s/\%s",dir1,dir2)
 packs<-c("cardUtils","clickableImageMap","editDriver",
 "heartsCIM","iterationDriver","logos","playOneTrick",
 "playWholeHandDriverPassParams","probTab","relaxDriver")
-l<-sortedInputForCheckBuildInstallSourcePackageDriver(dir,packs,"iterationDriver",TRUE)
+l<-sortedInputForCheckBuildInstallSourcePackageDriver(dir,packs,packs,TRUE)
+
+dir<-"~/personal/hearts/hearts_card_game_bayesian_inference/packages.12.25.23"
+packs<-c("parseCreationTime","retrieve","probsDriverDriver","chisqDriver","html",
+        "probsRandomDriverDriver","resamplingProbsMatrix","remapping")
+lll<-sortedInputForCheckBuildInstallSourcePackageDriver(dir,packs,"retrieve",TRUE)
 }
 
 }

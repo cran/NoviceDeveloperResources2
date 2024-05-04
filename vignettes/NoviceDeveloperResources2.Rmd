@@ -119,7 +119,30 @@ Here is a real-world example:
 
 Figure 7. Example of using a local copy of a global matrix to change a single value within the global matrix (see lines 987 through 989).
 
-<span style="color:red;">**4. How to access data in a subdirectory of another package**</span>
+
+<center>
+**MISCELLANEOUS THINGS THAT ARE HARD TO FIGURE OUT **
+</center>
+
+<span style="color:red;">**1. How to generate and retrieve data for use in examples**</span>
+
+When you are writing an example for a function in a package, it may sometimes be quite tedious to generate the various data and data structures that are needed. However, these items are generated naturally during a run of the program. We can capture these items as they are generated, and (literally) *save()* them for future retrieval.
+
+The first step is to create a subdirectory named *data* within the main package directory.
+
+Next, scan through the code to find the locations where a desired data item is generated. Insert a line of code that makes a copy of this item, naming the copy  as *x_[actual name of the item]*. The x will remind you that this is an example item, and it will prevent any possible confusion with the actual item.
+
+Next, issue a *save()* command specifying the path name, as shown in the real-life scenario, in which the first line is a real line of code, and the next 2 lines are inserted to show how to save the data item. After the items are saved in the data directory, comment out the 2 extra lines. It is best to leave them there, in case, at a later time, you need to review (or possibly re-do) what you had done.
+
+**gtab<-gtable::gtable_add_grob(gtab,scatter,scatterPlotRow,1,name="scatter")<br>
+x_gtab2<-gtab<br>
+save(x_gtab2,file=sprintf("%s/%s/%s",getwd(),"data","x_gtab2.RData"))**<br><br>
+
+There is one final step, namely you need to add a documentation file, for each .RData file, to the *man* subdirectory. For the example given here, the name of this file will be *x_gtab2.Rd*:
+
+![](screen1.1.jpg)
+<br><br>
+<span style="color:red;">**2. How to access data in a subdirectory of another package**</span>
 
 Say you are writing an example for a function in package A, and the example needs to use data that is in a subdirectory of package B. You can use the *system.file()* command.
 
@@ -129,20 +152,20 @@ Here is a real-life scenario in which I am preparing an example for a function i
 actual<-as.matrix(read.table(actualFile))[1:52,1:4]<br>
 lead(actual=actual,leader=2)**<br><br>
 
-<span style="color:red;">**5. How to run a non-R program script from R code in a package**</span>
+<span style="color:red;">**3. How to run a non-R program script from R code in a package**</span>
 
-Say you have an *awk* script in a .awk file that is invoked by an R function in a package. You will need to specify the absolute path name for the .awk file. Fortunately this can be done dynamically using the *.libPaths()* function.
+Say you have an *awk* script in a .awk file that is invoked by an R function in a package. You will need to specify the absolute path name for the .awk file. Fortunately this can be done dynamically using the *getSysLib()* function.
 
 Here is a real-world example. In this case, the .awk file is located in the *inst* subdirectory of the *retrieve* package. But in the specification within the library directory the *inst* is not included in the path name.
 
 Note also that the *awk* script is invoked by the *system()* command
 
-**syst=sprintf("gawk -f %s/retrieve/handsWithoutBots.awk %s",.libPaths(),f)<br>
+**syst=sprintf("gawk -f %s/retrieve/handsWithoutBots.awk %s",getSysLib(),f)<br>
 good<-system(syst,intern=TRUE)**
 
 <br>
 
-<span style="color:red;">**6. How to invoke *library()* from R code in a package**</span>
+<span style="color:red;">**4. How to invoke *library()* from R code in a package**</span>
 
 You are not allowed to issue a *library()* command from within a function in a CRAN package. The purpose of this restriction is to avoid inadvertently changing the search path without the user's knowledge.
 
@@ -154,21 +177,52 @@ Less convenient option is to generate a character string as the return value of 
 returnStr<-sprintf("%s\\nlibrary(%s)",returnStr,pack)<br>
 return(returnStr)**
 
-More convenient option is to pass a Boolean parameter *autoLibrary* (whose default value is FALSE) to the function, so that the user must explicitly set it to TRUE and thus knowingly implement the library() command using the *eval(parse())* mechanism. This can be preceded by a detach() command to make sure that the library() command results in the search path containing the latest version of the package. This automates the process, and the user no longer needs to copy and paste.
+A more convenient option is to pass a Boolean parameter *autoLibrary* (whose default value is FALSE) to the function, so that the user must explicitly set it to TRUE and thus knowingly implement the library() command using the *eval(parse())* mechanism. This can be preceded by a detach() command to make sure that the library() command results in the search path containing the latest version of the package. This automates the process, and the user no longer needs to copy and paste.
 
 **if(autoLibrary) {<br>
 eval(parse(text = sprintf("detach(\\"package:%s\\")",pack)))<br>
 eval(parse(text = sprintf("library(%s)",pack)))<br>
 }**
+<br><br>
 
+<span style="color:red;">**5. How to maintain consistency in library accesses**</span>
+
+This is a more or less hidden feature that gave me a lot of trouble until I understood how it works. I hope I can save you some of that trouble.
+
+Here is an abbreviated version of the type of output you might see when you issue the **library()** command from the R Console, (Figure. 8). This shows 2 libraries, the user library and the system library.
+
+
+
+![](Figure8.jpg)
+
+I initially did not understand that there are these 2 separate libraries, and this ignorance led to a lot of frustration. For instance, if you edit the R source code within your package, and then re-install it, the package version with the updated source code will end up in one of the two libraries. If you do not explicitly specify which library, you are at the mercy of a default mechanism that is happening in a hidden manner. Likewise, when you load the package into your search path, you are again at the mercy of a default mechanism that is happening in a hidden manner. The net result is that you may end up using the older version of the package.
+
+Now I avoid those problems by consistently using only the system library. That is, I save updates only to the system library, and I access only the system library. Here are the technical details showing how to accomplish these goals within my own R code.
+
+**NoviceDeveloperResources::getSysLib()** will return the full path name of the system library.
+
+In the NoviceDeveloperResources package, installation into the correct library is performed by
+**install.packages(b,repos=NULL,type='source',lib=lib,verbose=TRUE),type="message")**
+where lib is specified as the system library.
+
+Loading is carried out *via* a line of code in NoviceDeveloperResources::zload()
+**eval(parse(text = sprintf("library(%s,lib.loc='%s', verbose=TRUE)",pack,lib.loc)))**
+where lib.loc is specified as the system library.
+
+Within RStudio, under "Build > Configure Build Tools..." type in to the install package options space:<br>
+"-l " followed by the full path name of the system library  as shown in Figure 9.
+
+![](Figure9.jpg)
+
+<br><br>
 <center>
 **GRAPHICAL DISPLAY OF INTER-RELATIONSHIP OF PACKAGES AND PROGRAMS **
 </center>
 
 My package *foodwebWrapper* (available in CRAN) provides a graphical representation that might help to keep track of the complex relationships that occur in a project that is split across multiple packages. Please see the *foodwebWrapper* package documentation and vignettes for full details.
 
-Figure 8 shows the depiction of the callers and callees for a complex project that includes 10 inter-related packages. Each **row** represents a caller, and each **column** represents a callee. The names of the callers are given along the left side of the figure, and the names of the callees are given along the top of the figure.
+Figure 10 shows the depiction of the callers and callees for a complex project that includes 10 inter-related packages. Each **row** represents a caller, and each **column** represents a callee. The names of the callers are given along the left side of the figure, and the names of the callees are given along the top of the figure.
 
-![](Figure8.jpg){width=300%}
+![](Figure10.jpg){width=300%}
 
-Figure 8. Depiction of foodwebWrapper analysis for the set of 10 CRAN packages that comprise my hearts card game project.
+Figure 10. Depiction of foodwebWrapper analysis for the set of 10 CRAN packages that comprise my hearts card game project.

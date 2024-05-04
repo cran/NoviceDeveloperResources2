@@ -23,11 +23,13 @@ checkBuildInstallSourcePackage(). These are weeded out by sortedInputForcheckBui
 }
 \examples{
 \dontrun{
-dir<-"~/inference_packages/"
+# you need to specify dir, packs that are on your own computer !!
+dir1<-"~/personal/hearts/hearts_card_game_bayesian_inference"
+dir2<-"packages/inference_packages/inference_packages/"
 packs<-c("cardUtils","clickableImageMap","editDriver",
 "heartsCIM","iterationDriver","logos","playOneTrick",
 "playWholeHandDriverPassParams","probTab","relaxDriver")
-master<-PackageDependencies(packs,vector("list",length(packs)),1,TRUE)
+master<-PackageDependencies(sprintf("\%s/\%s",dir1,dir2),packs,vector("list",length(packs)),1,TRUE)
 retrieve<-retrieveLeafNodes(master)
 }
 
