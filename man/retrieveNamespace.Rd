@@ -13,7 +13,7 @@ retrieveNamespace(dir, packs)
 }
 \value{
 returns a list containing the intersection of
-(1) imported package names and (2) packs list
+ (1) imported package names and (2) packs list
 }
 \description{
 retrieve a list of the imported packages in a NAMESPACE FILE
@@ -26,7 +26,7 @@ dir2<-"packages/inference_packages/inference_packages/"
 dir<-sprintf("\%s/\%s",dir1,dir2)
 packs<-c("cardUtils","clickableImageMap","editDriver",
 "heartsCIM","iterationDriver","logos","playOneTrick",
-"playWholeHandDriverPassParams","probTab","relaxDriver")
+"playWholeHandDriverPassParams","probTab","relaxDriver","remapping")
 rns<-retrieveNamespace(dir,packs)
 }
 

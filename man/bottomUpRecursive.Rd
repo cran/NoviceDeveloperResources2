@@ -9,7 +9,7 @@ bottomUpRecursive(l, p0)
 \arguments{
 \item{l}{return value of retrieveNamespace()}
 
-\item{p0}{list of those packages whose R code has been modified by the developer}
+\item{p0}{character vector of the names of the packages to check()}
 }
 \value{
 returns a list of the original query packages plus the packages that directly import them
@@ -25,7 +25,7 @@ dir1<-"~/personal/hearts/hearts_card_game_bayesian_inference"
 dir2<-"packages/inference_packages/inference_packages/"
 packs<-c("cardUtils","clickableImageMap","editDriver",
 "heartsCIM","iterationDriver","logos","playOneTrick",
-"playWholeHandDriverPassParams","probTab","relaxDriver")
+"playWholeHandDriverPassParams","probTab","relaxDriver","remapping")
 l<-retrieveNamespace(sprintf("\%s/\%s",dir1,dir2),packs)
 bur<-bottomUpRecursive(l,c("iterationDriver"))
 }

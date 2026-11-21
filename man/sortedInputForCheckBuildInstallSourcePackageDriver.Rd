@@ -4,7 +4,13 @@
 \alias{sortedInputForCheckBuildInstallSourcePackageDriver}
 \title{sortedInputForCheckBuildInstallSourcePackageDriver}
 \usage{
-sortedInputForCheckBuildInstallSourcePackageDriver(dir, packs, p0, verbose)
+sortedInputForCheckBuildInstallSourcePackageDriver(
+  dir,
+  packs,
+  p0,
+  verbose,
+  check = TRUE
+)
 }
 \arguments{
 \item{dir}{character string containing the path name of the directory holding the package folders}
@@ -14,6 +20,8 @@ sortedInputForCheckBuildInstallSourcePackageDriver(dir, packs, p0, verbose)
 \item{p0}{list of those packages whose R code has been modified by the developer}
 
 \item{verbose}{if TRUE print line indicating the recursion level}
+
+\item{check}{parameter passed to checkBuildInstallSourcePackage() - Boolean if FALSE skip check() and document()}
 }
 \value{
 a list whose components are the return values of checkBuildInstallSourcePackage()
@@ -25,12 +33,12 @@ ordered list of packages as input and to invoke checkBuildInstallSourcePackage()
 }
 \details{
 This driver is the single master function to run in order to invoke
-all of the other functions in the packages \emph{NoviceDeveloperResources} and
-\emph{NoviceDeveloperResources2}.
-
-In the examples, I show the actual call using
-packages that are currently under development, so they are not yet available
-(I expect them to be available in mid-2024).
+ all of the other functions in the packages *NoviceDeveloperResources* and
+  *NoviceDeveloperResources2*.
+  
+  In the examples, I show the actual call using
+   packages that are currently under development, so they are not yet available 
+   (I expect them to be available in mid-2024).
 }
 \examples{
 \dontrun{
@@ -38,9 +46,10 @@ packages that are currently under development, so they are not yet available
 dir1<-"~/personal/hearts/hearts_card_game_bayesian_inference"
 dir2<-"packages/inference_packages/inference_packages/"
 dir<-sprintf("\%s/\%s",dir1,dir2)
+dir<-"~/IPdir2"
 packs<-c("cardUtils","clickableImageMap","editDriver",
 "heartsCIM","iterationDriver","logos","playOneTrick",
-"playWholeHandDriverPassParams","probTab","relaxDriver")
+"playWholeHandDriverPassParams","probTab","relaxDriver","remapping")
 l<-sortedInputForCheckBuildInstallSourcePackageDriver(dir,packs,packs,TRUE)
 
 dir<-"~/personal/hearts/hearts_card_game_bayesian_inference/packages.12.25.23"

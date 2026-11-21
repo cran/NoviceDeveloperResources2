@@ -26,7 +26,7 @@ dir1<-"~/personal/hearts/hearts_card_game_bayesian_inference"
 dir2<-"packages/inference_packages/inference_packages/"
 packs<-c("cardUtils","clickableImageMap","editDriver",
 "heartsCIM","iterationDriver","logos","playOneTrick",
-"playWholeHandDriverPassParams","probTab","relaxDriver")
+"playWholeHandDriverPassParams","probTab","relaxDriver","remapping")
 l<-retrieveNamespace(sprintf("\%s/\%s",dir1,dir2),packs)
 burd<-bottomUpRecursiveDriver(l,c("iterationDriver"),TRUE)
 }

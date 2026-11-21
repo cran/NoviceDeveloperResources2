@@ -1,6 +1,6 @@
 Package: NoviceDeveloperResources2
-Version: 1.1.0
-Date: 2024-05-04
+Version: 1.2
+Date: 2026-11-21
 Title: Further Resources to Assist Novice Developers
 Authors@R: c(
           person("Barry", "Zeeberg", email = "barryz2013@gmail.com",
@@ -13,10 +13,10 @@ License: GPL (>= 2)
 Encoding: UTF-8
 VignetteBuilder: knitr
 Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
-RoxygenNote: 7.3.1
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2024-05-04 17:24:53 UTC; barryzeeberg
+Packaged: 2026-11-21 14:22:19 UTC; barryzeeberg
 Author: Barry Zeeberg [aut, cre]
 Repository: CRAN
-Date/Publication: 2024-05-04 17:40:02 UTC
+Date/Publication: 2026-11-21 16:10:02 UTC
+Config/roxygen2/version: 8.1.0

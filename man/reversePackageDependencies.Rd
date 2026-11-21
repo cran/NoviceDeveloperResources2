@@ -13,11 +13,11 @@ reversePackageDependencies(l)
 returns a list whose components are 2 lists:
 \item{$original}{
 a list whose components are lists of package names that have non-zero length import dependencies
-ll$original is same as l, but deleting zero-length elements i.e., leaf nodes
+ ll$original is same as l, but deleting zero-length elements i.e., leaf nodes
 }
 \item{$zeros}{
 a list whose components are lists of package names that have zero length import dependencies (i.e., leaf nodes)
-ll$zeros zero-length elements, leaf nodes that had been deleted in ll$original
+ ll$zeros zero-length elements, leaf nodes that had been deleted in ll$original	
 }
 }
 \description{
@@ -26,17 +26,17 @@ separate the packages in packs list having length zero or non-zero dependencies
 \details{
 the return value ll is like:
 
-$original [cardUtils is no longer a name of ll$original since it had length 0]
+$original \[cardUtils is no longer a name of ll$original since it had length 0\]
 
 $original$editDriver
 
-[1] "cardUtils"         "clickableImageMap" "heartsCIM"         "logos"             "probTab"
+\[1\] "cardUtils"         "clickableImageMap" "heartsCIM"         "logos"             "probTab"
 
 $zeros
 
-$zeros$cardUtils cardUtils is an element of ll$zeros since l[["cardUtils"]] has length 0
+$zeros$cardUtils cardUtils is an element of ll$zeros since l\[\["cardUtils"\]\] has length 0
 
-[1] "cardUtils"
+\[1\] "cardUtils"
 }
 \examples{
 \dontrun{
@@ -45,7 +45,7 @@ dir1<-"~/personal/hearts/hearts_card_game_bayesian_inference"
 dir2<-"packages/inference_packages/inference_packages/"
 packs<-c("cardUtils","clickableImageMap","editDriver",
 "heartsCIM","iterationDriver","logos","playOneTrick",
-"playWholeHandDriverPassParams","probTab","relaxDriver")
+"playWholeHandDriverPassParams","probTab","relaxDriver","remapping")
 l<-retrieveNamespace(sprintf("\%s/\%s",dir1,dir2),packs)
 ll<-reversePackageDependencies(l)
 }

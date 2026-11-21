@@ -14,7 +14,7 @@
 #' dir2<-"packages/inference_packages/inference_packages/"
 #' packs<-c("cardUtils","clickableImageMap","editDriver",
 #' "heartsCIM","iterationDriver","logos","playOneTrick",
-#' "playWholeHandDriverPassParams","probTab","relaxDriver")
+#' "playWholeHandDriverPassParams","probTab","relaxDriver","remapping")
 #' l<-retrieveNamespace(sprintf("%s/%s",dir1,dir2),packs)
 #' ll<-reversePackageDependencies(l)
 #' }
@@ -81,7 +81,7 @@ reversePackageDependencies<-
 #' dir2<-"packages/inference_packages/inference_packages/"
 #' packs<-c("cardUtils","clickableImageMap","editDriver",
 #' "heartsCIM","iterationDriver","logos","playOneTrick",
-#' "playWholeHandDriverPassParams","probTab","relaxDriver")
+#' "playWholeHandDriverPassParams","probTab","relaxDriver","remapping")
 #' master<-PackageDependencies(sprintf("%s/%s",dir1,dir2),packs, vector("list",length(packs)),1,TRUE)
 #' }
 #'
@@ -110,7 +110,7 @@ PackageDependencies<-
    
     master[[n]][["ll"]]<-ll
     if(verbose)
-      print(c("sortedInputForCheckBuildInstallSourcePackageDriver RECURSION LEVEL...",n),quote=FALSE)
+      print(c("PackageDependencies RECURSION LEVEL...",n),quote=FALSE)
     if(length(ll$original)==0)
       return(master)
     PackageDependencies(dir,names(ll$original),master,n+1,verbose)
@@ -130,7 +130,7 @@ PackageDependencies<-
 #' dir2<-"packages/inference_packages/inference_packages/"
 #' packs<-c("cardUtils","clickableImageMap","editDriver",
 #' "heartsCIM","iterationDriver","logos","playOneTrick",
-#' "playWholeHandDriverPassParams","probTab","relaxDriver")
+#' "playWholeHandDriverPassParams","probTab","relaxDriver","remapping")
 #' master<-PackageDependencies(sprintf("%s/%s",dir1,dir2),packs,vector("list",length(packs)),1,TRUE)
 #' retrieve<-retrieveLeafNodes(master)
 #' }
@@ -160,7 +160,7 @@ retrieveLeafNodes<-
 #'	the packages in the list
 #'
 #' @param l return value of retrieveNamespace()
-#' @param p0 list of those packages whose R code has been modified by the developer
+#' @param p0 character vector of the names of the packages to check()
 #'
 #' @examples
 #' \dontrun{
@@ -169,7 +169,7 @@ retrieveLeafNodes<-
 #' dir2<-"packages/inference_packages/inference_packages/"
 #' packs<-c("cardUtils","clickableImageMap","editDriver",
 #' "heartsCIM","iterationDriver","logos","playOneTrick",
-#' "playWholeHandDriverPassParams","probTab","relaxDriver")
+#' "playWholeHandDriverPassParams","probTab","relaxDriver","remapping")
 #' l<-retrieveNamespace(sprintf("%s/%s",dir1,dir2),packs)
 #' bur<-bottomUpRecursive(l,c("iterationDriver"))
 #' }
@@ -186,10 +186,8 @@ bottomUpRecursive<-
     ll<-list()
     for(p in names(l)) {
       w<-which(l[[p]] %in% p0) # w is the index/position of p0 within the list l[[p]]
-      if(length(w)>0) {
+      if(length(w)>0)
         ll[[p]]<-p
-        #print(c(p,w,l[[p]][w]))
-      }
     }
     # return a list of the original query packages plus the packages that directly import them
     return(union(ll,p0))
@@ -210,7 +208,7 @@ bottomUpRecursive<-
 #' dir2<-"packages/inference_packages/inference_packages/"
 #' packs<-c("cardUtils","clickableImageMap","editDriver",
 #' "heartsCIM","iterationDriver","logos","playOneTrick",
-#' "playWholeHandDriverPassParams","probTab","relaxDriver")
+#' "playWholeHandDriverPassParams","probTab","relaxDriver","remapping")
 #' l<-retrieveNamespace(sprintf("%s/%s",dir1,dir2),packs)
 #' burd<-bottomUpRecursiveDriver(l,c("iterationDriver"),TRUE)
 #' }
@@ -225,10 +223,11 @@ bottomUpRecursiveDriver<-
   function(l,p0,verbose) {
     for(i in 1:20) { # set finite limits to avoid infinite loop in case of some error condition
       if(verbose)
-        print(c("bottomUpRecursiveDriver RECURSION LEVEL",i),quote=FALSE)
-      if(i>1)
+        print(c("bottomUpRecursiveDriver RECURSION LEVEL",i,p0),quote=FALSE)
+      if(i>1) {
         if(length(oldp0)==length(p0))
           return(p0)
+      }
       oldp0<-p0
       p0<-bottomUpRecursive(l,p0)
     }	
@@ -249,7 +248,7 @@ bottomUpRecursiveDriver<-
 #' dir2<-"packages/inference_packages/inference_packages/"
 #' packs<-c("cardUtils","clickableImageMap","editDriver",
 #' "heartsCIM","iterationDriver","logos","playOneTrick",
-#' "playWholeHandDriverPassParams","probTab","relaxDriver")
+#' "playWholeHandDriverPassParams","probTab","relaxDriver","remapping")
 #' master<-PackageDependencies(sprintf("%s/%s",dir1,dir2),packs,vector("list",length(packs)),1,TRUE)
 #' l<-retrieveNamespace(sprintf("%s/%s",dir1,dir2),packs)
 #' burd<-bottomUpRecursiveDriver(l,c("iterationDriver"),TRUE)
@@ -275,6 +274,7 @@ sortedInputForCheckBuildInstallSourcePackage<-
 #' @param packs list of package names
 #' @param p0 list of those packages whose R code has been modified by the developer
 #' @param verbose if TRUE print line indicating the recursion level
+#' @param check parameter passed to checkBuildInstallSourcePackage() - Boolean if FALSE skip check() and document()
 #'
 #' @details This driver is the single master function to run in order to invoke
 #'  all of the other functions in the packages *NoviceDeveloperResources* and
@@ -290,9 +290,10 @@ sortedInputForCheckBuildInstallSourcePackage<-
 #' dir1<-"~/personal/hearts/hearts_card_game_bayesian_inference"
 #' dir2<-"packages/inference_packages/inference_packages/"
 #' dir<-sprintf("%s/%s",dir1,dir2)
+#' dir<-"~/IPdir2"
 #' packs<-c("cardUtils","clickableImageMap","editDriver",
 #' "heartsCIM","iterationDriver","logos","playOneTrick",
-#' "playWholeHandDriverPassParams","probTab","relaxDriver")
+#' "playWholeHandDriverPassParams","probTab","relaxDriver","remapping")
 #' l<-sortedInputForCheckBuildInstallSourcePackageDriver(dir,packs,packs,TRUE)
 #' 
 #' dir<-"~/personal/hearts/hearts_card_game_bayesian_inference/packages.12.25.23"
@@ -306,13 +307,17 @@ sortedInputForCheckBuildInstallSourcePackage<-
 #'
 #' @export
 sortedInputForCheckBuildInstallSourcePackageDriver<-
-  function(dir,packs,p0,verbose) {
+  function(dir,packs,p0,verbose,check=TRUE) {
     l<-list()
     master<-PackageDependencies(dir,packs,vector("list",length(packs)),1,TRUE)
     retrieve<-retrieveLeafNodes(master)
     burd<-bottomUpRecursiveDriver(master[[1]][["l"]],p0,TRUE)
     s<-sortedInputForCheckBuildInstallSourcePackage(retrieve,burd)
-    l$attach<-checkBuildInstallSourcePackage(dir,retrieve,s,TRUE)
+    
+    # modified on september 22 2026
+    #l$attach<-checkBuildInstallSourcePackage(dir,retrieve,s,TRUE)
+    l$attach<-checkBuildInstallSourcePackage(dir,s,p0,check,TRUE)
+    
     l$conflict<-conflictOfInterestRestricted(packs)
     
     # this script can take a little while, notify user when it is finished
@@ -337,7 +342,7 @@ sortedInputForCheckBuildInstallSourcePackageDriver<-
 #' dir<-sprintf("%s/%s",dir1,dir2)
 #' packs<-c("cardUtils","clickableImageMap","editDriver",
 #' "heartsCIM","iterationDriver","logos","playOneTrick",
-#' "playWholeHandDriverPassParams","probTab","relaxDriver")
+#' "playWholeHandDriverPassParams","probTab","relaxDriver","remapping")
 #' rns<-retrieveNamespace(dir,packs)
 #' }
 #' 
